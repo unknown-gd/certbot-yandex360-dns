@@ -167,6 +167,8 @@ A JSON body with `"domains": [...]` means the token and org ID work.
 
 ## Usage
 
+Issue a certificate once:
+
 ```bash
 certbot certonly --agree-tos \
   --authenticator dns-yandex360 \
@@ -183,15 +185,75 @@ certbot certonly --agree-tos \
   -d '*.example.com'
 ```
 
+`certonly` does **not** keep renewing by itself. Certbot writes renewal settings
+under `/etc/letsencrypt/renewal/`; a scheduled job must run `certbot renew`.
+
+### Keep certificates renewed
+
+1. Confirm a dry run works with this plugin:
+
+```bash
+sudo certbot renew --dry-run
+```
+
+2. Schedule `certbot renew` if nothing is already running it:
+
+```bash
+systemctl list-timers 'certbot*'   # systemd
+ls /etc/cron.*/*certbot* 2>/dev/null   # cron
+```
+
+**systemd** (typical for a `/opt/certbot` install):
+
+```bash
+sudo tee /etc/systemd/system/certbot-renew.service >/dev/null <<'EOF'
+[Unit]
+Description=Certbot renew
+
+[Service]
+Type=oneshot
+ExecStart=/opt/certbot/bin/certbot renew --quiet
+EOF
+
+sudo tee /etc/systemd/system/certbot-renew.timer >/dev/null <<'EOF'
+[Unit]
+Description=Run Certbot renew twice daily
+
+[Timer]
+OnCalendar=*-*-* 00,12:00:00
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now certbot-renew.timer
+sudo systemctl list-timers certbot-renew.timer
+```
+
+**cron** alternative:
+
+```bash
+echo "0 0,12 * * * root /opt/certbot/bin/certbot renew --quiet" \
+  | sudo tee /etc/cron.d/certbot
+```
+
+Adjust `/opt/certbot/bin/certbot` if Certbot lives elsewhere (`which certbot`).
+
+For renewals to succeed, keep the plugin installed in Certbot’s Python env and
+leave the credentials file in place (default `/etc/letsencrypt/yandex360.ini`).
+
 The plugin lists domains in the organization and uses the most specific domain
 that matches the challenge name, so subdomain zones work.
 
 ## Options
 
-| Command line                               | Credentials file                            | Default |
-|--------------------------------------------|---------------------------------------------|---------|
-| `--dns-yandex360-propagation-seconds 180`  | `dns_yandex360_propagation_seconds = 180`   | `120`   |
-| `--dns-yandex360-follow-cname`             | `dns_yandex360_follow_cname = true`         | off     |
+| Command line                              | Credentials file                          | Default |
+| ----------------------------------------- | ----------------------------------------- | ------- |
+| `--dns-yandex360-propagation-seconds 180` | `dns_yandex360_propagation_seconds = 180` | `120`   |
+| `--dns-yandex360-follow-cname`            | `dns_yandex360_follow_cname = true`       | off     |
 
 A value on the command line (or in Certbot's `cli.ini`) wins over the
 credentials file. Command-line values are stored for renewal; credentials-file
