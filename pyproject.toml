@@ -1,0 +1,45 @@
+[project]
+dynamic = ["version"]
+name = "certbot-dns-yandex360"
+description = "Certbot DNS Plugin for Yandex 360"
+keywords = [
+    "certbot",
+    "dns",
+    "yandex360",
+    "acme",
+    "letsencrypt",
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "certbot>=2.0",
+    "dnspython>=2.1.0",
+    "requests>=2.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[project.entry-points."certbot.plugins"]
+dns-yandex360 = "certbot_dns_yandex360.authenticator:Yandex360DNSAuthenticator"
+
+[build-system]
+requires = [
+    "setuptools>=80",
+    "setuptools_scm[simple]>=8",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
