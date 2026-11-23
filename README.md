@@ -6,25 +6,111 @@ Native Certbot DNS-01 authenticator for domains managed in
 
 ## Installation
 
-If Certbot lives in a virtualenv (for example `/opt/certbot`):
+The plugin must be installed into the **same Python environment** that runs
+`certbot`. Pick the matching path below.
+
+### 1. Install Certbot
+
+Official pip-based install (recommended for third-party DNS plugins):
 
 ```bash
-/opt/certbot/bin/pip install certbot-dns-yandex360
+sudo python3 -m venv /opt/certbot
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot
+sudo ln -sf /opt/certbot/bin/certbot /usr/local/bin/certbot
 ```
 
-From a local checkout:
+Confirm Certbot works:
 
 ```bash
-pip install .
+certbot --version
 ```
 
-Confirm the plugin is visible:
+If you already installed Certbot another way, find its Python and use that for
+the plugin install:
+
+```bash
+# example: snap
+which certbot
+# or: readlink -f "$(which certbot)"
+```
+
+Snap Certbot isolates plugins; this package is not published as a snap yet, so
+prefer the `/opt/certbot` venv above (or any other shared venv) for this plugin.
+
+### 2. Install the plugin
+
+#### From PyPI (when published)
+
+With pip into the Certbot venv:
+
+```bash
+sudo /opt/certbot/bin/pip install certbot-dns-yandex360
+```
+
+With [uv](https://docs.astral.sh/uv/) into the same venv:
+
+```bash
+sudo uv pip install --python /opt/certbot/bin/python certbot-dns-yandex360
+```
+
+#### From a local checkout
+
+```bash
+git clone <this-repo-url> certbot-yandex360-dns
+cd certbot-yandex360-dns
+```
+
+pip:
+
+```bash
+sudo /opt/certbot/bin/pip install .
+# editable (dev):
+sudo /opt/certbot/bin/pip install -e .
+```
+
+uv:
+
+```bash
+sudo uv pip install --python /opt/certbot/bin/python .
+# editable (dev):
+sudo uv pip install --python /opt/certbot/bin/python -e .
+```
+
+#### From Git (no local clone)
+
+```bash
+sudo /opt/certbot/bin/pip install "git+https://github.com/<owner>/certbot-yandex360-dns.git"
+# or
+sudo uv pip install --python /opt/certbot/bin/python \
+  "git+https://github.com/<owner>/certbot-yandex360-dns.git"
+```
+
+### 3. Verify the plugin
 
 ```bash
 certbot plugins
 ```
 
-You should see `dns-yandex360`.
+You should see `dns-yandex360` with interface `Authenticator`. Example:
+
+```text
+* dns-yandex360
+Description: Obtain certificates using a DNS TXT record (Yandex 360 DNS API).
+Interfaces: Authenticator, Plugin
+Entry point: EntryPoint(name='dns-yandex360',
+value='certbot_dns_yandex360.authenticator:Yandex360DNSAuthenticator',
+group='certbot.plugins')
+```
+
+If it is missing, Certbot is almost always using a different Python than the one
+you installed into. Re-run the install with that interpreter:
+
+```bash
+# discover which python certbot uses
+head -1 "$(which certbot)"   # #!/opt/certbot/bin/python
+sudo uv pip install --python /opt/certbot/bin/python -e .
+```
 
 ## Credentials
 
@@ -125,8 +211,19 @@ away from the main zone by delegating challenges to a dedicated ACME zone.
 
 ## Development
 
+With pip:
+
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -e ".[dev]"
 .venv/bin/pytest
+```
+
+With uv:
+
+```bash
+uv venv
+uv pip install -e ".[dev]"
+uv run pytest
+uv run certbot plugins
 ```
