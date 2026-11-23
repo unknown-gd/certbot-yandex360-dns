@@ -112,6 +112,50 @@ head -1 "$(which certbot)"   # #!/opt/certbot/bin/python
 sudo uv pip install --python /opt/certbot/bin/python -e .
 ```
 
+### 4. Upgrade the plugin
+
+Always install into the same Python Certbot uses (`/opt/certbot/bin/python` in
+the examples below).
+
+**From a local checkout:**
+
+```bash
+cd certbot-yandex360-dns
+git pull
+
+sudo /opt/certbot/bin/pip install --upgrade .
+# or with uv:
+sudo uv pip install --python /opt/certbot/bin/python --reinstall .
+```
+
+If you installed editable (`-e .`), `git pull` is enough unless dependencies
+changed.
+
+**From Git:**
+
+```bash
+sudo /opt/certbot/bin/pip install --upgrade \
+  "git+https://github.com/<owner>/certbot-yandex360-dns.git"
+# or
+sudo uv pip install --python /opt/certbot/bin/python --reinstall \
+  "git+https://github.com/<owner>/certbot-yandex360-dns.git"
+```
+
+**From PyPI (when published):**
+
+```bash
+sudo /opt/certbot/bin/pip install --upgrade certbot-dns-yandex360
+# or
+sudo uv pip install --python /opt/certbot/bin/python --upgrade certbot-dns-yandex360
+```
+
+Then confirm:
+
+```bash
+certbot plugins
+sudo certbot renew --dry-run
+```
+
 ## Credentials
 
 Create `/etc/letsencrypt/yandex360.ini`:
