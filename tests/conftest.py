@@ -6,7 +6,7 @@ import pytest
 def _make_config(set_by_user=(), **values):
     """Minimal stand-in for Certbot's NamespaceConfig with plugin defaults."""
     defaults = {
-        "dns_yandex360_propagation_seconds": 120,
+        "dns_yandex360_propagation_seconds": 600,
         "dns_yandex360_follow_cname": False,
     }
     return SimpleNamespace(

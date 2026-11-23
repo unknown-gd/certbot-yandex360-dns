@@ -71,7 +71,7 @@ def test_parser_defaults_and_flag():
     Yandex360DNSAuthenticator.inject_parser_options(parser, "dns-yandex360")
 
     defaults = parser.parse_args([])
-    assert defaults.dns_yandex360_propagation_seconds == 120
+    assert defaults.dns_yandex360_propagation_seconds == 600
     assert defaults.dns_yandex360_follow_cname is False
 
     given = parser.parse_args(
@@ -87,7 +87,7 @@ def test_parser_defaults_and_flag():
 
 def test_defaults_without_credentials_file_options(make_authenticator):
     auth = make_authenticator()
-    assert auth.conf("propagation-seconds") == 120
+    assert auth.conf("propagation-seconds") == 600
     assert auth.conf("follow-cname") is False
 
 

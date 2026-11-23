@@ -252,7 +252,7 @@ that matches the challenge name, so subdomain zones work.
 
 | Command line                              | Credentials file                          | Default |
 | ----------------------------------------- | ----------------------------------------- | ------- |
-| `--dns-yandex360-propagation-seconds 180` | `dns_yandex360_propagation_seconds = 180` | `120`   |
+| `--dns-yandex360-propagation-seconds 180` | `dns_yandex360_propagation_seconds = 180` | `600`   |
 | `--dns-yandex360-follow-cname`            | `dns_yandex360_follow_cname = true`       | off     |
 
 A value on the command line (or in Certbot's `cli.ini`) wins over the

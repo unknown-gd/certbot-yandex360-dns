@@ -44,7 +44,7 @@ class Yandex360DNSAuthenticator(dns_common.DNSAuthenticator):
         self.credentials: dns_common.CredentialsConfiguration | None = None
 
     @classmethod
-    def add_parser_arguments(cls, add, default_propagation_seconds=120):
+    def add_parser_arguments(cls, add, default_propagation_seconds=600):
         super().add_parser_arguments(add, default_propagation_seconds)
         add(
             "credentials",
