@@ -4,6 +4,10 @@ Native Certbot DNS-01 authenticator for domains managed in
 [Yandex 360](https://360.yandex.ru) via the
 [Directory DNS API](https://yandex.ru/dev/api360/doc/ref/DomainDNSService/).
 
+Guides:
+
+- [Use Certbot certificates on Proxmox VE](docs/proxmox.md)
+
 ## Installation
 
 The plugin must be installed into the **same Python environment** that runs
